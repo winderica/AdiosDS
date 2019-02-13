@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "parser.cpp"
+#include "formatter.cpp"
 
 using namespace std;
 
@@ -14,7 +15,10 @@ int main() {
             code += line;
             code.push_back('\n');
         }
-        outputFile << Parser(code).parse().dump(2);
+        string parsed = Parser(code).parse().dump(2);
+        outputFile << parsed;
+        Formatter formatter(parsed);
+        formatter.beginFormat();
     } catch (const string &e) {
         cout << e;
     }

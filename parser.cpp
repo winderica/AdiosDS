@@ -161,10 +161,10 @@ class Parser {
     }
 
     json parseParameters() {
-        json params;
+        json params = json::array();
         while (definitionIncoming()) {
             json definition = parseDefinition();
-            definition["kind"] = "ParameterDefinition";
+            definition["kind"] = "ParameterDeclaration";
             params.push_back(definition);
 
             if (lookahead(")")) {
@@ -177,8 +177,8 @@ class Parser {
     }
 
     json parseBody(bool shouldBeBlock = false) {
+        json statements = json::array();
         if (curr == '{' || shouldBeBlock) {
-            json statements;
             json block;
             block["kind"] = "BlockStatement";
             block["position"] = lineNumber;
@@ -195,7 +195,10 @@ class Parser {
             json line;
             line["kind"] = "InlineStatement";
             line["position"] = lineNumber;
-            line["body"] = parseStatement();
+            if (!lookahead(";")) {
+                statements.push_back(parseStatement());
+            }
+            line["body"] = statements;
             return line;
         }
     }
@@ -210,6 +213,8 @@ class Parser {
             statement["body"] = parseBody();
             if (lookahead("else")) {
                 statement["elseBody"] = parseBody();
+            } else {
+                statement["elseBody"] = nullptr;
             }
             return statement;
         } else if (lookahead("while")) {
@@ -232,7 +237,12 @@ class Parser {
             statement["kind"] = "ForStatement";
             statement["position"] = lineNumber;
             consume("(");
-            statement["init"] = parseStatement();
+            json init = parseStatement();
+            string kind = init["kind"];
+            if (kind == "VariableDefinition" || kind == "VariableDeclaration") {
+                init["kind"] = "For" + kind;
+            }
+            statement["init"] = init;
             statement["condition"] = parseExpression(";");
             statement["step"] = parseExpression(")");
             statement["body"] = parseBody();
@@ -240,7 +250,7 @@ class Parser {
         } else if (lookahead("return")) {
             statement["kind"] = "ReturnStatement";
             statement["position"] = lineNumber;
-            statement["argument"] = parseExpression(";");
+            statement["value"] = parseExpression(";");
             return statement;
         } else if (lookahead("break")) {
             statement["kind"] = "BreakStatement";
@@ -254,12 +264,30 @@ class Parser {
             return statement;
         } else if (definitionIncoming()) {
             json definition = parseDefinition();
-            if (lookahead("=")) {
-                definition["kind"] = "VariableDefinition";
-                definition["value"] = parseExpression(";");
+            json length;
+            while (lookahead("[")) {
+                if (!lookahead("]")) {
+                    length.push_back(parseExpression());
+                    consume("]");
+                }
+            }
+            if (!length.empty()) {
+                definition["length"] = length;
+                if (lookahead("=")) {
+                    definition["kind"] = "ArrayDefinition";
+                    definition["value"] = parseExpression(";");
+                } else {
+                    definition["kind"] = "ArrayDeclaration";
+                    consume(";");
+                }
             } else {
-                definition["kind"] = "VariableDeclaration";
-                consume(";");
+                if (lookahead("=")) {
+                    definition["kind"] = "VariableDefinition";
+                    definition["value"] = parseExpression(";");
+                } else {
+                    definition["kind"] = "VariableDeclaration";
+                    consume(";");
+                }
             }
             return definition;
         } else {
@@ -427,7 +455,7 @@ class Parser {
     }
 
     json parseDefinition() {
-        json modifiers;
+        json modifiers = json::array();
         bool hasModifier;
         json type;
         do {
@@ -666,12 +694,12 @@ public:
                     if (lookahead(";")) {
                         json functionDeclaration = definition;
                         functionDeclaration["kind"] = "FunctionDeclaration";
-                        functionDeclaration["parameter"] = parseParameters();
+                        functionDeclaration["parameters"] = parseParameters();
                         statements.push_back(functionDeclaration);
                     } else {
                         json functionDefinition = definition;
                         functionDefinition["kind"] = "FunctionDefinition";
-                        functionDefinition["parameter"] = parseParameters();
+                        functionDefinition["parameters"] = parseParameters();
                         functionDefinition["body"] = parseBody(true);
                         statements.push_back(functionDefinition);
                     }

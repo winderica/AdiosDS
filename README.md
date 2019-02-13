@@ -1,6 +1,6 @@
 ## description
 
-simple c parser
+simple c parser && formatter
 
 ## dependency
 
