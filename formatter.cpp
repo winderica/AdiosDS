@@ -32,14 +32,15 @@ public:
             for (const json &item: body) {
                 format(item);
             }
-        } else if (kind == "FunctionDefinition" || kind == "FunctionDeclaration") {
-            json type = source["type"];
-            vector<string> modifiers = type["modifiers"];
+        } else if (kind == "Type") {
+            vector<string> modifiers = source["modifiers"];
             for (const string &modifier: modifiers) {
                 stream << modifier + " ";
             }
-            string name = type["name"];
+            string name = source["name"];
             stream << name + " ";
+        } else if (kind == "FunctionDefinition" || kind == "FunctionDeclaration") {
+            format(source["type"]);
             format(source["identifier"]);
             stream << "(";
             vector<json> params = source["parameters"];
@@ -67,13 +68,7 @@ public:
                    || kind == "VariableDefinition" || kind == "VariableDeclaration"
                    || kind == "ForVariableDefinition" || kind == "ForVariableDeclaration"
                 ) {
-            json type = source["type"];
-            vector<string> modifiers = type["modifiers"];
-            for (const string &modifier: modifiers) {
-                stream << modifier + " ";
-            }
-            string name = type["name"];
-            stream << name + " ";
+            format(source["type"]);
             format(source["identifier"]);
             if (kind.find("Array") != string::npos) {
                 vector<json> lengths = source["length"];
@@ -224,6 +219,15 @@ public:
                 format(label);
             }
             stream << ";";
+        } else if (kind == "IncludeStatement") {
+            stream << "#include ";
+            string file = source["file"];
+            stream << file + "\n";
+        } else if (kind == "TypeDefinition") {
+            stream << "typedef ";
+            format(source["type"]);
+            format(source["identifier"]);
+            stream << ";\n";
         }
     }
 

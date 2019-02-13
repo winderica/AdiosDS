@@ -1,24 +1,52 @@
 {
   "body": [
     {
+      "file": "<stdlib>",
+      "kind": "IncludeStatement"
+    },
+    {
+      "identifier": {
+        "kind": "Identifier",
+        "name": "ccccc",
+        "position": 2
+      },
+      "kind": "TypeDefinition",
+      "position": 2,
+      "type": {
+        "kind": "Type",
+        "modifiers": [
+          "register",
+          "extern",
+          "static",
+          "signed",
+          "long",
+          "long",
+          "long",
+          "long"
+        ],
+        "name": "char",
+        "position": 2
+      }
+    },
+    {
       "body": {
         "body": [],
         "kind": "BlockStatement",
-        "position": 1
+        "position": 4
       },
       "identifier": {
         "kind": "Identifier",
         "name": "a",
-        "position": 1
+        "position": 4
       },
       "kind": "FunctionDefinition",
       "parameters": [],
-      "position": 1,
+      "position": 4,
       "type": {
         "kind": "Type",
         "modifiers": [],
-        "name": "int",
-        "position": 1
+        "name": "void",
+        "position": 4
       }
     },
     {
@@ -28,25 +56,25 @@
             "body": {
               "body": [],
               "kind": "InlineStatement",
-              "position": 6
+              "position": 9
             },
             "condition": {
               "kind": "BinaryExpression",
               "left": {
                 "kind": "Identifier",
                 "name": "a",
-                "position": 6
+                "position": 9
               },
               "operator": "==",
-              "position": 6,
+              "position": 9,
               "right": {
                 "kind": "NumberLiteral",
-                "position": 6,
+                "position": 9,
                 "value": "2"
               }
             },
             "kind": "WhileStatement",
-            "position": 6
+            "position": 9
           },
           {
             "body": {
@@ -63,35 +91,239 @@
                                 "left": {
                                   "kind": "Identifier",
                                   "name": "b",
-                                  "position": 10
+                                  "position": 13
                                 },
                                 "operator": "=",
-                                "position": 10,
+                                "position": 13,
                                 "right": {
                                   "kind": "NumberLiteral",
-                                  "position": 10,
+                                  "position": 13,
                                   "value": "2"
                                 }
                               },
                               "kind": "ExpressionStatement",
-                              "position": 10
+                              "position": 13
                             }
                           ],
                           "kind": "InlineStatement",
-                          "position": 10
+                          "position": 13
                         },
                         "condition": {
                           "kind": "BinaryExpression",
                           "left": {
                             "kind": "Identifier",
                             "name": "a",
-                            "position": 9
+                            "position": 12
                           },
                           "operator": "=",
-                          "position": 9,
+                          "position": 12,
                           "right": {
                             "kind": "NumberLiteral",
-                            "position": 9,
+                            "position": 12,
+                            "value": "3"
+                          }
+                        },
+                        "elseBody": {
+                          "body": [
+                            {
+                              "body": {
+                                "body": [
+                                  {
+                                    "expression": {
+                                      "kind": "BinaryExpression",
+                                      "left": {
+                                        "kind": "Identifier",
+                                        "name": "b",
+                                        "position": 15
+                                      },
+                                      "operator": "=",
+                                      "position": 15,
+                                      "right": {
+                                        "kind": "NumberLiteral",
+                                        "position": 15,
+                                        "value": "3"
+                                      }
+                                    },
+                                    "kind": "ExpressionStatement",
+                                    "position": 15
+                                  }
+                                ],
+                                "kind": "InlineStatement",
+                                "position": 15
+                              },
+                              "condition": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 14
+                                },
+                                "operator": "=",
+                                "position": 14,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 14,
+                                  "value": "2"
+                                }
+                              },
+                              "elseBody": {
+                                "body": [
+                                  {
+                                    "expression": {
+                                      "kind": "BinaryExpression",
+                                      "left": {
+                                        "kind": "Identifier",
+                                        "name": "b",
+                                        "position": 16
+                                      },
+                                      "operator": "=",
+                                      "position": 16,
+                                      "right": {
+                                        "kind": "NumberLiteral",
+                                        "position": 16,
+                                        "value": "4"
+                                      }
+                                    },
+                                    "kind": "ExpressionStatement",
+                                    "position": 16
+                                  }
+                                ],
+                                "kind": "InlineStatement",
+                                "position": 16
+                              },
+                              "kind": "IfStatement",
+                              "position": 14
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 14
+                        },
+                        "kind": "IfStatement",
+                        "position": 12
+                      }
+                    ],
+                    "kind": "InlineStatement",
+                    "position": 12
+                  },
+                  "condition": {
+                    "kind": "BinaryExpression",
+                    "left": {
+                      "kind": "Identifier",
+                      "name": "a",
+                      "position": 11
+                    },
+                    "operator": "<=",
+                    "position": 11,
+                    "right": {
+                      "kind": "NumberLiteral",
+                      "position": 11,
+                      "value": "2"
+                    }
+                  },
+                  "kind": "WhileStatement",
+                  "position": 11
+                }
+              ],
+              "kind": "InlineStatement",
+              "position": 11
+            },
+            "condition": {
+              "kind": "BinaryExpression",
+              "left": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 10
+              },
+              "operator": "<",
+              "position": 10,
+              "right": {
+                "kind": "NumberLiteral",
+                "position": 10,
+                "value": "100"
+              }
+            },
+            "init": {
+              "identifier": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 10
+              },
+              "kind": "ForVariableDefinition",
+              "position": 10,
+              "type": {
+                "kind": "Type",
+                "modifiers": [],
+                "name": "int",
+                "position": 10
+              },
+              "value": {
+                "kind": "NumberLiteral",
+                "position": 10,
+                "value": "0"
+              }
+            },
+            "kind": "ForStatement",
+            "position": 10,
+            "step": {
+              "kind": "BinaryExpression",
+              "left": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 10
+              },
+              "operator": "+=",
+              "position": 10,
+              "right": {
+                "kind": "NumberLiteral",
+                "position": 10,
+                "value": "1"
+              }
+            }
+          },
+          {
+            "body": {
+              "body": [
+                {
+                  "body": {
+                    "body": [
+                      {
+                        "body": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 20
+                                },
+                                "operator": "=",
+                                "position": 20,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 20,
+                                  "value": "2"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 20
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 20
+                        },
+                        "condition": {
+                          "kind": "BinaryExpression",
+                          "left": {
+                            "kind": "Identifier",
+                            "name": "a",
+                            "position": 19
+                          },
+                          "operator": "=",
+                          "position": 19,
+                          "right": {
+                            "kind": "NumberLiteral",
+                            "position": 19,
                             "value": "3"
                           }
                         },
@@ -103,64 +335,346 @@
                                 "left": {
                                   "kind": "Identifier",
                                   "name": "b",
-                                  "position": 12
+                                  "position": 22
                                 },
                                 "operator": "=",
-                                "position": 12,
+                                "position": 22,
                                 "right": {
                                   "kind": "NumberLiteral",
-                                  "position": 12,
+                                  "position": 22,
                                   "value": "3"
                                 }
                               },
                               "kind": "ExpressionStatement",
-                              "position": 12
+                              "position": 22
                             }
                           ],
                           "kind": "InlineStatement",
-                          "position": 12
+                          "position": 22
                         },
                         "kind": "IfStatement",
-                        "position": 9
+                        "position": 19
                       }
                     ],
                     "kind": "InlineStatement",
-                    "position": 9
+                    "position": 19
                   },
                   "condition": {
                     "kind": "BinaryExpression",
                     "left": {
                       "kind": "Identifier",
                       "name": "a",
-                      "position": 8
+                      "position": 18
                     },
                     "operator": "<=",
-                    "position": 8,
+                    "position": 18,
                     "right": {
                       "kind": "NumberLiteral",
-                      "position": 8,
+                      "position": 18,
                       "value": "2"
                     }
                   },
                   "kind": "WhileStatement",
-                  "position": 8
+                  "position": 18
+                },
+                {
+                  "body": {
+                    "body": [
+                      {
+                        "body": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 25
+                                },
+                                "operator": "=",
+                                "position": 25,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 25,
+                                  "value": "2"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 25
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 25
+                        },
+                        "condition": {
+                          "kind": "BinaryExpression",
+                          "left": {
+                            "kind": "Identifier",
+                            "name": "a",
+                            "position": 24
+                          },
+                          "operator": "=",
+                          "position": 24,
+                          "right": {
+                            "kind": "NumberLiteral",
+                            "position": 24,
+                            "value": "3"
+                          }
+                        },
+                        "elseBody": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 27
+                                },
+                                "operator": "=",
+                                "position": 27,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 27,
+                                  "value": "3"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 27
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 27
+                        },
+                        "kind": "IfStatement",
+                        "position": 24
+                      }
+                    ],
+                    "kind": "InlineStatement",
+                    "position": 24
+                  },
+                  "condition": {
+                    "kind": "BinaryExpression",
+                    "left": {
+                      "kind": "Identifier",
+                      "name": "a",
+                      "position": 23
+                    },
+                    "operator": "<=",
+                    "position": 23,
+                    "right": {
+                      "kind": "NumberLiteral",
+                      "position": 23,
+                      "value": "2"
+                    }
+                  },
+                  "kind": "WhileStatement",
+                  "position": 23
+                },
+                {
+                  "body": {
+                    "body": [
+                      {
+                        "body": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 29
+                                },
+                                "operator": "=",
+                                "position": 29,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 29,
+                                  "value": "2"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 29
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 29
+                        },
+                        "condition": {
+                          "kind": "BinaryExpression",
+                          "left": {
+                            "kind": "Identifier",
+                            "name": "a",
+                            "position": 28
+                          },
+                          "operator": "=",
+                          "position": 28,
+                          "right": {
+                            "kind": "NumberLiteral",
+                            "position": 28,
+                            "value": "3"
+                          }
+                        },
+                        "elseBody": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 31
+                                },
+                                "operator": "=",
+                                "position": 31,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 31,
+                                  "value": "3"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 31
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 31
+                        },
+                        "kind": "IfStatement",
+                        "position": 28
+                      }
+                    ],
+                    "kind": "InlineStatement",
+                    "position": 28
+                  },
+                  "condition": {
+                    "kind": "BinaryExpression",
+                    "left": {
+                      "kind": "Identifier",
+                      "name": "a",
+                      "position": 27
+                    },
+                    "operator": "<=",
+                    "position": 27,
+                    "right": {
+                      "kind": "NumberLiteral",
+                      "position": 27,
+                      "value": "2"
+                    }
+                  },
+                  "kind": "WhileStatement",
+                  "position": 27
+                },
+                {
+                  "body": {
+                    "body": [
+                      {
+                        "body": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 33
+                                },
+                                "operator": "=",
+                                "position": 33,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 33,
+                                  "value": "2"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 33
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 33
+                        },
+                        "condition": {
+                          "kind": "BinaryExpression",
+                          "left": {
+                            "kind": "Identifier",
+                            "name": "a",
+                            "position": 32
+                          },
+                          "operator": "=",
+                          "position": 32,
+                          "right": {
+                            "kind": "NumberLiteral",
+                            "position": 32,
+                            "value": "3"
+                          }
+                        },
+                        "elseBody": {
+                          "body": [
+                            {
+                              "expression": {
+                                "kind": "BinaryExpression",
+                                "left": {
+                                  "kind": "Identifier",
+                                  "name": "b",
+                                  "position": 35
+                                },
+                                "operator": "=",
+                                "position": 35,
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "position": 35,
+                                  "value": "3"
+                                }
+                              },
+                              "kind": "ExpressionStatement",
+                              "position": 35
+                            }
+                          ],
+                          "kind": "InlineStatement",
+                          "position": 35
+                        },
+                        "kind": "IfStatement",
+                        "position": 32
+                      }
+                    ],
+                    "kind": "InlineStatement",
+                    "position": 32
+                  },
+                  "condition": {
+                    "kind": "BinaryExpression",
+                    "left": {
+                      "kind": "Identifier",
+                      "name": "a",
+                      "position": 31
+                    },
+                    "operator": "<=",
+                    "position": 31,
+                    "right": {
+                      "kind": "NumberLiteral",
+                      "position": 31,
+                      "value": "2"
+                    }
+                  },
+                  "kind": "WhileStatement",
+                  "position": 31
                 }
               ],
-              "kind": "InlineStatement",
-              "position": 8
+              "kind": "BlockStatement",
+              "position": 17
             },
             "condition": {
               "kind": "BinaryExpression",
               "left": {
                 "kind": "Identifier",
                 "name": "i",
-                "position": 7
+                "position": 17
               },
               "operator": "<",
-              "position": 7,
+              "position": 17,
               "right": {
                 "kind": "NumberLiteral",
-                "position": 7,
+                "position": 17,
                 "value": "100"
               }
             },
@@ -168,57 +682,57 @@
               "identifier": {
                 "kind": "Identifier",
                 "name": "i",
-                "position": 7
+                "position": 17
               },
               "kind": "ForVariableDefinition",
-              "position": 7,
+              "position": 17,
               "type": {
                 "kind": "Type",
                 "modifiers": [],
                 "name": "int",
-                "position": 7
+                "position": 17
               },
               "value": {
                 "kind": "NumberLiteral",
-                "position": 7,
+                "position": 17,
                 "value": "0"
               }
             },
             "kind": "ForStatement",
-            "position": 7,
+            "position": 17,
             "step": {
               "kind": "BinaryExpression",
               "left": {
                 "kind": "Identifier",
                 "name": "i",
-                "position": 7
+                "position": 17
               },
               "operator": "+=",
-              "position": 7,
+              "position": 17,
               "right": {
                 "kind": "NumberLiteral",
-                "position": 7,
+                "position": 17,
                 "value": "1"
               }
             }
           },
           {
             "kind": "ReturnStatement",
-            "position": 13,
+            "position": 38,
             "value": {
               "kind": "NumberLiteral",
-              "position": 13,
+              "position": 38,
               "value": "3"
             }
           }
         ],
         "kind": "BlockStatement",
-        "position": 5
+        "position": 8
       },
       "identifier": {
         "kind": "Identifier",
         "name": "main",
-        "position": 5
+        "position": 8
       },
       "kind": "FunctionDefinition",
       "parameters": [
@@ -226,39 +740,39 @@
           "identifier": {
             "kind": "Identifier",
             "name": "a",
-            "position": 5
+            "position": 8
           },
           "kind": "ParameterDeclaration",
-          "position": 5,
+          "position": 8,
           "type": {
             "kind": "Type",
             "modifiers": [],
             "name": "int",
-            "position": 5
+            "position": 8
           }
         },
         {
           "identifier": {
             "kind": "Identifier",
             "name": "b",
-            "position": 5
+            "position": 8
           },
           "kind": "ParameterDeclaration",
-          "position": 5,
+          "position": 8,
           "type": {
             "kind": "Type",
             "modifiers": [],
             "name": "int",
-            "position": 5
+            "position": 8
           }
         }
       ],
-      "position": 5,
+      "position": 8,
       "type": {
         "kind": "Type",
         "modifiers": [],
         "name": "int",
-        "position": 5
+        "position": 8
       }
     }
   ],

@@ -485,10 +485,33 @@ class Parser {
         throw unexpected(stream.str());
     }
 
+    json parseInclude() {
+        json statement;
+        statement["kind"] = "IncludeStatement";
+        string str;
+        if (curr == '<') {
+            while (curr && curr != '>') {
+                str.push_back(curr);
+                next(true);
+            }
+        } else if (curr == '"') {
+            while (curr && curr != '"') {
+                str.push_back(curr);
+                next(true);
+            }
+        } else {
+            throw unexpected("\" or <");
+        }
+        str.push_back(curr);
+        next(true);
+        statement["file"] = str;
+        return statement;
+    }
+
     string parseString(bool keepBlanks = false) {
         string str;
         next(true, true);
-        while (curr && curr != '\"') {
+        while (curr && curr != '"') {
             if (curr == '\\') {
                 next(true, true);
                 str.push_back(parseEscape());
@@ -625,6 +648,7 @@ class Parser {
         return false;
     }
 
+    // TODO: parse comment
     bool skipComments(bool withComments) {
         if (withComments) {
             return false;
@@ -670,7 +694,9 @@ public:
         json statements;
         while (curr) {
             skipSpaces();
-            if (definitionIncoming()) {
+            if (lookahead("#include")) {
+                statements.push_back(parseInclude());
+            } else if (definitionIncoming()) {
                 json definition = parseDefinition();
                 json length;
                 while (lookahead("[")) {
@@ -727,6 +753,7 @@ public:
                 throw unexpected("definition");
             }
         }
+
         json program;
         program["kind"] = "Program";
         program["body"] = statements;
