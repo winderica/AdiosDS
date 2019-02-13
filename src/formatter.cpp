@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include "json.hpp"
+#include "../lib/json.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -231,9 +231,9 @@ public:
         }
     }
 
-    void beginFormat() {
+    void beginFormat(const string &filename) {
         format(src);
-        ofstream file("../formatted.c");
+        ofstream file(filename);
         file << stream.str();
     }
 };

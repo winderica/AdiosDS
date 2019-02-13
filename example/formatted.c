@@ -1,5 +1,5 @@
 #include <stdlib>
-typedef register extern static signed long long long long char ccccc;
+typedef register extern static signed long long long long long long long long long long long long char ccccc;
 void a() {}
 int main(int a, int b) {
     while (a == 2) {}
@@ -43,6 +43,25 @@ int main(int a, int b) {
                 b = 2;
             } else {
                 b = 3;
+            }
+        }
+        for (int i = 0; i < 100; i += 1) {
+            for (int i = 0; i < 100; i += 1) {
+                for (int i = 0; i < 100; i += 1) {
+                    for (int i = 0; i < 100; i += 1) {
+                        for (int i = 0; i < 100; i += 1) {
+                            for (int i = 0; i < 100; i += 1) {
+                                for (int i = 0; i < 100; i += 1) {
+                                    for (int i = 0; i < 100; i += 1) {
+                                        for (int i = 0; i < 100; i += 1) {
+                                            c = 2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

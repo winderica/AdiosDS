@@ -7,8 +7,8 @@ using namespace std;
 
 int main() {
     try {
-        ifstream inputFile("../test.c");
-        ofstream outputFile("../test.json");
+        ifstream inputFile("../example/test.c");
+        ofstream outputFile("../example/test.json");
         string line;
         string code;
         while (getline(inputFile, line)) {
@@ -18,7 +18,7 @@ int main() {
         string parsed = Parser(code).parse().dump(2);
         outputFile << parsed;
         Formatter formatter(parsed);
-        formatter.beginFormat();
+        formatter.beginFormat("../example/formatted.c");
     } catch (const string &e) {
         cout << e;
     }
