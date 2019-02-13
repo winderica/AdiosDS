@@ -1,0 +1,136 @@
+{
+  "body": [
+    {
+      "body": {
+        "body": [
+          {
+            "body": {
+              "body": {
+                "body": {
+                  "body": {
+                    "expression": {
+                      "kind": "BinaryExpression",
+                      "left": {
+                        "kind": "Identifier",
+                        "name": "k",
+                        "position": 3
+                      },
+                      "operator": "=",
+                      "position": 3,
+                      "right": {
+                        "kind": "NumberLiteral",
+                        "position": 3,
+                        "value": "3"
+                      }
+                    },
+                    "kind": "ExpressionStatement",
+                    "position": 3
+                  },
+                  "kind": "InlineStatement",
+                  "position": 3
+                },
+                "condition": {
+                  "kind": "BinaryExpression",
+                  "left": {
+                    "kind": "Identifier",
+                    "name": "j",
+                    "position": 3
+                  },
+                  "operator": ">",
+                  "position": 3,
+                  "right": {
+                    "kind": "NumberLiteral",
+                    "position": 3,
+                    "value": "0"
+                  }
+                },
+                "kind": "WhileStatement",
+                "position": 3
+              },
+              "kind": "InlineStatement",
+              "position": 3
+            },
+            "condition": {
+              "kind": "BinaryExpression",
+              "left": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 2
+              },
+              "operator": "<=",
+              "position": 2,
+              "right": {
+                "kind": "NumberLiteral",
+                "position": 2,
+                "value": "100"
+              }
+            },
+            "init": {
+              "identifier": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 2
+              },
+              "kind": "VariableDefinition",
+              "position": 2,
+              "type": {
+                "kind": "Type",
+                "modifiers": null,
+                "name": "int",
+                "position": 2
+              },
+              "value": {
+                "kind": "NumberLiteral",
+                "position": 2,
+                "value": "0"
+              }
+            },
+            "kind": "ForStatement",
+            "position": 2,
+            "step": {
+              "kind": "BinaryExpression",
+              "left": {
+                "kind": "Identifier",
+                "name": "i",
+                "position": 2
+              },
+              "operator": "+=",
+              "position": 2,
+              "right": {
+                "kind": "NumberLiteral",
+                "position": 2,
+                "value": "1"
+              }
+            }
+          },
+          {
+            "argument": {
+              "kind": "NumberLiteral",
+              "position": 4,
+              "value": "1"
+            },
+            "kind": "ReturnStatement",
+            "position": 4
+          }
+        ],
+        "kind": "BlockStatement",
+        "position": 1
+      },
+      "identifier": {
+        "kind": "Identifier",
+        "name": "main",
+        "position": 1
+      },
+      "kind": "FunctionDefinition",
+      "parameter": null,
+      "position": 1,
+      "type": {
+        "kind": "Type",
+        "modifiers": null,
+        "name": "int",
+        "position": 1
+      }
+    }
+  ],
+  "kind": "Program"
+}
