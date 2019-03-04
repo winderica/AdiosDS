@@ -29,6 +29,7 @@ class Parser {
     char curr;
     int index;
     int lineNumber;
+    vector<json> comments;
 
     map<string, int> precedence = {
             {"=",   1},
@@ -185,6 +186,12 @@ class Parser {
             consume("{");
 
             while (curr && curr != '}') {
+                if (!comments.empty()) {
+                    for (const json &comment: comments) {
+                        statements.push_back(comment);
+                    }
+                    comments.clear();
+                }
                 statements.push_back(parseStatement());
             }
 
@@ -386,10 +393,15 @@ class Parser {
             expression["position"] = lineNumber;
             expression["value"] = parseString();
             return expression;
+        } else if (lookahead("0x")) {
+            expression["kind"] = "NumberLiteral";
+            expression["position"] = lineNumber;
+            expression["value"] = "0x" + parseNumber(16);
+            return expression;
         } else if (isFloat(curr)) {
             expression["kind"] = "NumberLiteral";
             expression["position"] = lineNumber;
-            expression["value"] = parseNumber();
+            expression["value"] = parseNumber(10);
             return expression;
         } else if (isIdentifierStart(curr)) {
             return parseIdentifier();
@@ -552,7 +564,7 @@ class Parser {
             next(true, true);
             return escape;
         } else {
-            throw unexpected("escape sequence");
+            throw unexpected("Escape sequence");
         }
     }
 
@@ -576,20 +588,26 @@ class Parser {
         return identifier;
     }
 
-    string parseNumber(bool keepBlanks = false) {
-        if (!isFloat(curr)) {
+    string parseNumber(int numbers) {
+        if (numbers == 16 ? !isHex(curr) : !isFloat(curr)) {
             throw unexpected("Number");
         }
 
         string number = string(1, curr);
         next(true);
-        while (curr && isFloat(curr)) {
+        while (curr && (numbers == 16 ? isHex(curr) : isFloat(curr))) {
             number.push_back(curr);
             next(true);
         }
-        if (!keepBlanks) {
-            skipSpaces();
+        if (curr == 'L' || curr == 'l'
+            || curr == 'U' || curr == 'u') {
+            number.push_back(curr);
+            next(true);
         }
+        if (numbers == 16 && curr == '.') {
+            throw unexpected("hex number");
+        }
+        skipSpaces();
         return number;
     }
 
@@ -648,31 +666,31 @@ class Parser {
         return false;
     }
 
-    // TODO: parse comment
-    bool skipComments(bool withComments) {
-        if (withComments) {
-            return false;
-        }
-        if (curr && curr == '/' && source[index + 1] == '/') {
-            while (curr != '\n') {
-                index++;
-                curr = source[index];
-            }
-            return true;
-        }
-        if (curr && curr == '/' && source[index + 1] == '*') {
+    json parseComment() {
+        json statement;
+        string str;
+//        skipSpaces();
+        if (lookahead("/*")) {
+            statement["kind"] = "BlockComment";
+            statement["position"] = lineNumber;
             while (curr != '*' || source[index + 1] != '/') {
-                if (curr == '\n') {
-                    lineNumber++;
-                }
-                index++;
-                curr = source[index];
+                str.push_back(curr);
+                next(true);
             }
+            statement["content"] = str;
             index += 2;
             curr = source[index];
-            return true;
+        } else if (lookahead("//")) {
+            statement["kind"] = "InlineComment";
+            statement["position"] = lineNumber;
+            while (!isSpace(curr)) {
+                str.push_back(curr);
+                next(true);
+            }
+            skipSpaces();
+            statement["content"] = str;
         }
-        return false;
+        return statement;
     }
 
     void next(bool withSpaces = false, bool withComments = false) {
@@ -683,7 +701,15 @@ class Parser {
         curr = source[index];
         bool skipped;
         do {
-            skipped = skipComments(withComments) || skipSpaces(withSpaces);
+            skipped = false;
+            if (skipSpaces(withSpaces)) {
+                skipped = true;
+            }
+            json comment = parseComment();
+            if (!comment.is_null()) {
+                skipped = true;
+                comments.push_back(comment);
+            }
         } while (skipped);
     };
 public:
@@ -694,6 +720,12 @@ public:
         json statements;
         while (curr) {
             skipSpaces();
+            if (!comments.empty()) {
+                for (const json &comment: comments) {
+                    statements.push_back(comment);
+                }
+                comments.clear();
+            }
             if (lookahead("#include")) {
                 statements.push_back(parseInclude());
             } else if (definitionIncoming()) {
@@ -743,12 +775,13 @@ public:
             } else if (lookahead("typedef")) {
                 json definition = parseDefinition();
                 definition["kind"] = "TypeDefinition";
+                typeNames.push_back(definition["identifier"]["name"]);
                 consume(";");
                 statements.push_back(definition);
             } else if (lookahead("struct")) {
-                throw "struct is not supported";
+                throw "Struct is not supported";
             } else if (lookahead("enum")) {
-                throw "enum is not supported";
+                throw "Enum is not supported";
             } else {
                 throw unexpected("definition");
             }

@@ -1,9 +1,28 @@
 #include <stdlib>
+/* 123 */
 typedef register extern static signed long long long long long long long long long long long long char ccccc;
-void a() {}
+// 123
+ccccc a() {}
+/* *
+ *
+ *  */
+// 123
 int main(int a, int b) {
-    while (a == 2) {}
-    for (int i = 0; i < 100; i += 1) {
+    /* 123 */
+
+    /* 123 */
+
+    /* 123 */
+
+    for (; ; ) {
+        /*  */
+
+        a = 123;
+    }
+    while () {}
+    // 123
+
+    for (int i = 0; i < 0x11l; i += 1) {
         while (a <= 2) {
             if (a = 3) {
                 b = 2;

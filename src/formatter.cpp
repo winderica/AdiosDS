@@ -1,5 +1,4 @@
 #include <string>
-#include <vector>
 #include <fstream>
 #include "../lib/json.hpp"
 
@@ -28,14 +27,14 @@ public:
         indent(indentLevel);
         string kind = source["kind"];
         if (kind == "Program") {
-            vector<json> body = source["body"];
+            json body = source["body"];
             for (const json &item: body) {
                 format(item);
             }
         } else if (kind == "Type") {
-            vector<string> modifiers = source["modifiers"];
-            for (const string &modifier: modifiers) {
-                stream << modifier + " ";
+            json modifiers = source["modifiers"];
+            for (const json &modifier: modifiers) {
+                stream << string(modifier) + " ";
             }
             string name = source["name"];
             stream << name + " ";
@@ -43,7 +42,7 @@ public:
             format(source["type"]);
             format(source["identifier"]);
             stream << "(";
-            vector<json> params = source["parameters"];
+            json params = source["parameters"];
             for (int i = 0; i < params.size(); i++) {
                 json param = params[i];
                 string typeName = param["type"]["name"];
@@ -66,12 +65,11 @@ public:
         } else if (kind == "GlobalVariableDeclaration" || kind == "GlobalVariableDefinition"
                    || kind == "ArrayDefinition" || kind == "ArrayDeclaration"
                    || kind == "VariableDefinition" || kind == "VariableDeclaration"
-                   || kind == "ForVariableDefinition" || kind == "ForVariableDeclaration"
-                ) {
+                   || kind == "ForVariableDefinition" || kind == "ForVariableDeclaration") {
             format(source["type"]);
             format(source["identifier"]);
             if (kind.find("Array") != string::npos) {
-                vector<json> lengths = source["length"];
+                json lengths = source["length"];
                 for (const json &length: lengths) {
                     stream << "[";
                     format(length);
@@ -97,7 +95,7 @@ public:
             string value = source["value"];
             stream << "\"" + value + "\"";
         } else if (kind == "ArrayLiteral") {
-            vector<json> values = source["value"];
+            json values = source["value"];
             stream << "{ ";
             for (int i = 0; i < values.size(); i++) {
                 format(values[i]);
@@ -116,7 +114,7 @@ public:
         } else if (kind == "IndexExpression") {
             string name = source["array"]["name"];
             stream << name;
-            vector<json> indexes = source["indexes"];
+            json indexes = source["indexes"];
             for (const json &index: indexes) {
                 stream << "[";
                 format(index);
@@ -126,7 +124,7 @@ public:
             string name = source["callee"]["name"];
             stream << name;
             stream << "(";
-            vector<json> arguments = source["arguments"];
+            json arguments = source["arguments"];
             for (int i = 0; i < arguments.size(); i++) {
                 format(arguments[i]);
                 if (i != arguments.size() - 1) {
@@ -139,10 +137,12 @@ public:
             stream << name;
         } else if (kind == "ExpressionStatement") {
             json expression = source["expression"];
-            format(expression);
+            if (!expression.is_null()) {
+                format(expression);
+            }
             stream << ";";
         } else if (kind == "BlockStatement" || kind == "InlineStatement") {
-            vector<json> body = source["body"];
+            json body = source["body"];
             for (const json &item: body) {
                 stream << "\n";
                 format(item, indentLevel + 1);
@@ -153,7 +153,9 @@ public:
         } else if (kind == "IfStatement") {
             stream << "if (";
             json condition = source["condition"];
-            format(condition);
+            if (!condition.is_null()) {
+                format(condition);
+            }
             stream << ") {";
             format(source["body"], indentLevel);
             indent(indentLevel);
@@ -171,10 +173,14 @@ public:
             format(init);
             stream << " ";
             json condition = source["condition"];
-            format(condition);
+            if (!condition.is_null()) {
+                format(condition);
+            }
             stream << "; ";
             json step = source["step"];
-            format(step);
+            if (!step.is_null()) {
+                format(step);
+            }
             stream << ") {";
             format(source["body"], indentLevel);
             indent(indentLevel);
@@ -182,7 +188,9 @@ public:
         } else if (kind == "WhileStatement") {
             stream << "while (";
             json condition = source["condition"];
-            format(condition);
+            if (!condition.is_null()) {
+                format(condition);
+            }
             stream << ") {";
             format(source["body"], indentLevel);
             indent(indentLevel);
@@ -193,7 +201,9 @@ public:
             indent(indentLevel);
             stream << "} while (";
             json condition = source["condition"];
-            format(condition);
+            if (!condition.is_null()) {
+                format(condition);
+            }
             stream << ");";
         } else if (kind == "ReturnStatement") {
             stream << "return";
@@ -228,6 +238,16 @@ public:
             format(source["type"]);
             format(source["identifier"]);
             stream << ";\n";
+        } else if (kind == "InlineComment") {
+            stream << "// ";
+            string content = source["content"];;
+            stream << content;
+            stream << "\n";
+        } else if (kind == "BlockComment") {
+            stream << "/* ";
+            string content = source["content"];;
+            stream << content;
+            stream << " */\n";
         }
     }
 
