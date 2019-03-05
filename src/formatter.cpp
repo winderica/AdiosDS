@@ -81,9 +81,9 @@ public:
                 json value = source["value"];
                 format(value);
             }
-            if (kind.find("For") == string::npos) {
-                stream << "\n";
-            }
+//            if (kind.find("For") == string::npos && kind.find("Array") == string::npos) {
+//                stream << "\n";
+//            }
             stream << ";";
         } else if (kind == "NumberLiteral") {
             string value = source["value"];

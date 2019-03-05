@@ -386,7 +386,7 @@ class Parser {
                 next(true, true);
             }
             consume("'");
-            expression["value"] = ch;
+            expression["value"] = string(1, ch);
             return expression;
         } else if (curr == '"') {
             expression["kind"] = "StringLiteral";
@@ -500,6 +500,7 @@ class Parser {
     json parseInclude() {
         json statement;
         statement["kind"] = "IncludeStatement";
+        statement["position"] = lineNumber;
         string str;
         if (curr == '<') {
             while (curr && curr != '>') {
@@ -539,6 +540,8 @@ class Parser {
     }
 
     char parseEscape() {
+        index++;
+        curr = source[index];
         if (curr == 'x') {
             next(true, true);
             int code = 0;
@@ -669,7 +672,6 @@ class Parser {
     json parseComment() {
         json statement;
         string str;
-//        skipSpaces();
         if (lookahead("/*")) {
             statement["kind"] = "BlockComment";
             statement["position"] = lineNumber;
@@ -687,7 +689,6 @@ class Parser {
                 str.push_back(curr);
                 next(true);
             }
-            skipSpaces();
             statement["content"] = str;
         }
         return statement;
