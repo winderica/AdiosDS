@@ -1,15 +1,16 @@
 #include <string>
 #include <fstream>
-#include "../lib/json.hpp"
-
-using namespace std;
-using json = nlohmann::json;
+#include "grammar.hpp"
 
 class Formatter {
 
     json src;
     stringstream stream;
 
+    /**
+     * Format code with indentation
+     * @param indentLevel - level of indentation
+     */
     void indent(int indentLevel) {
         if (stream.str().back() == '\n') {
             for (int i = 0; i < indentLevel; i++) {
@@ -19,10 +20,19 @@ class Formatter {
     }
 
 public:
+    /**
+     * Constructor of class
+     * @param src - source code
+     */
     explicit Formatter(const string &src) {
         this->src = json::parse(src);
     };
 
+    /**
+     * Format source code
+     * @param source - source code
+     * @param indentLevel - level of indentation
+     */
     void format(const json &source, int indentLevel = 0) {
         indent(indentLevel);
         string kind = source["kind"];
@@ -39,6 +49,7 @@ public:
             string name = source["name"];
             stream << name + " ";
         } else if (kind == "FunctionDefinition" || kind == "FunctionDeclaration") {
+            stream << "\n";
             format(source["type"]);
             format(source["identifier"]);
             stream << "(";
@@ -63,6 +74,7 @@ public:
             }
             stream << "\n";
         } else if (kind == "GlobalVariableDeclaration" || kind == "GlobalVariableDefinition"
+                   || kind == "GlobalArrayDefinition" || kind == "GlobalArrayDeclaration"
                    || kind == "ArrayDefinition" || kind == "ArrayDeclaration"
                    || kind == "VariableDefinition" || kind == "VariableDeclaration"
                    || kind == "ForVariableDefinition" || kind == "ForVariableDeclaration") {
@@ -81,11 +93,11 @@ public:
                 json value = source["value"];
                 format(value);
             }
-//            if (kind.find("For") == string::npos && kind.find("Array") == string::npos) {
-//                stream << "\n";
-//            }
             stream << ";";
-        } else if (kind == "NumberLiteral") {
+            if (kind.find("Global") != string::npos) {
+                stream << "\n";
+            }
+        } else if (kind.find("NumberLiteral") != string::npos) {
             string value = source["value"];
             stream << value;
         } else if (kind == "CharLiteral") {
@@ -131,6 +143,10 @@ public:
                     stream << ", ";
                 }
             }
+            stream << ")";
+        } else if (kind == "ParenthesesExpression") {
+            stream << "(";
+            format(source["expression"]);
             stream << ")";
         } else if (kind == "Identifier") {
             string name = source["name"];
@@ -233,7 +249,28 @@ public:
             stream << "#include ";
             string file = source["file"];
             stream << file + "\n";
+        } else if (kind == "PredefineStatement") {
+            stream << "#define ";
+            string identifier = source["identifier"]["name"];
+            stream << identifier;
+
+            json arguments = source["arguments"];
+            if (!arguments.is_null()) {
+                stream << "(";
+                for (int i = 0; i < arguments.size(); i++) {
+                    format(arguments[i]);
+                    if (i != arguments.size() - 1) {
+                        stream << ", ";
+                    }
+                }
+                stream << ")";
+            }
+            stream << " ";
+            json value = source["value"];
+            format(value);
+            stream << "\n";
         } else if (kind == "TypeDefinition") {
+            stream << "\n";
             stream << "typedef ";
             format(source["type"]);
             format(source["identifier"]);
@@ -247,11 +284,15 @@ public:
             stream << "/* ";
             string content = source["content"];;
             stream << content;
-            stream << " */\n";
+            stream << " */";
         }
     }
 
-    void beginFormat(const string &filename) {
+    /**
+     * Save result
+     * @param filename - file to be saved
+     */
+    void save(const string &filename) {
         format(src);
         ofstream file(filename);
         file << stream.str();
