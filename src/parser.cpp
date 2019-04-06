@@ -1,18 +1,13 @@
-#include <utility>
-
 #include <sstream>
 #include "parser.hpp"
-
-using namespace ParserNamespace;
 
 /**
  * Error on unexpected character
  * @param expected - expecting characters
  * @return - error message
  */
-string Parser::unexpected(const string &expected) {
-    string error = "Line number " + to_string(lineNumber) + ": Expect " + expected;
-    return error;
+runtime_error Parser::unexpected(const string &expected) {
+    return runtime_error("Line number " + to_string(lineNumber) + ": Expect " + expected);
 }
 
 /**
@@ -46,14 +41,13 @@ json Parser::parseBody(bool shouldBeBlock) {
         block.kind = "BlockStatement";
         block.position = lineNumber;
         consume("{");
-
-        while (curr && curr != '}') {
-            if (!comments.empty()) {
-                for (const json &comment: comments) {
-                    statements.push_back(comment);
-                }
-                comments.clear();
+        if (!comments.empty()) {
+            for (const json &comment: comments) {
+                statements.push_back(comment);
             }
+            comments.clear();
+        }
+        while (curr && curr != '}') {
             statements.push_back(parseStatement());
             if (!comments.empty()) {
                 for (const json &comment: comments) {
@@ -79,12 +73,6 @@ json Parser::parseBody(bool shouldBeBlock) {
         if (!lookahead(";")) {
             statements.push_back(parseStatement());
         }
-        if (!comments.empty()) {
-            for (const json &comment: comments) {
-                statements.push_back(comment);
-            }
-            comments.clear();
-        }
         line.body = statements;
         return line;
     }
@@ -100,7 +88,14 @@ json Parser::parseStatement() {
         statement.kind = "IfStatement";
         statement.position = lineNumber;
         consume("(");
-        statement.condition = parseExpression(")");
+        json condition = parseExpression(")");
+        if (condition.is_null()) {
+            throw unexpected("if condition");
+        }
+        statement.condition = condition;
+        if (lookahead("else")) {
+            throw unexpected("if body statement");
+        }
         statement.body = parseBody();
         if (lookahead("else")) {
             statement.elseBody = parseBody();
@@ -113,7 +108,11 @@ json Parser::parseStatement() {
         statement.kind = "WhileStatement";
         statement.position = lineNumber;
         consume("(");
-        statement.condition = parseExpression(")");
+        json condition = parseExpression(")");
+        if (condition.is_null()) {
+            throw unexpected("while condition");
+        }
+        statement.condition = condition;
         statement.body = parseBody();
         return statement;
     } else if (lookahead("do")) { // DoWhileStatement
@@ -123,7 +122,11 @@ json Parser::parseStatement() {
         statement.body = parseBody();
         consume("while");
         consume("(");
-        statement.condition = parseExpression(")");
+        json condition = parseExpression(")");
+        if (condition.is_null()) {
+            throw unexpected("while condition");
+        }
+        statement.condition = condition;
         consume(";");
         return statement;
     } else if (lookahead("for")) { // ForStatement
@@ -173,28 +176,33 @@ json Parser::parseStatement() {
 /**
  * Parse definition
  * @param declaration - original declaration
+ * @param isGlobal - is global variable
  * @return - JSON tree of definition
  */
-json Parser::parseDefinition(Declaration declaration, bool isGlobal) {
+json Parser::parseDefinition(const Declaration &declaration, bool isGlobal) {
     json length;
+    bool isArray = false;
     while (lookahead("[")) {
+        isArray = true;
         if (!lookahead("]")) {
             length.push_back(parseExpression());
             consume("]");
+        } else {
+            length.push_back(nullptr);
         }
     }
     Definition definition;
     definition.identifier = declaration.identifier;
     definition.type = declaration.type;
     definition.position = declaration.position;
-    if (!length.empty()) { // Array
+    if (isArray) { // Array
         definition.length = length;
     }
     if (lookahead("=")) { // Definition
-        definition.kind = length.empty() ? "VariableDefinition" : "ArrayDefinition";
+        definition.kind = isArray ? "ArrayDefinition" : "VariableDefinition";
         definition.value = parseExpression();
     } else { // Declaration
-        definition.kind = length.empty() ? "VariableDeclaration" : "ArrayDeclaration";
+        definition.kind = isArray ? "ArrayDeclaration" : "VariableDeclaration";
     }
     if (isGlobal) {
         definition.kind = "Global" + definition.kind;
@@ -213,14 +221,20 @@ json Parser::parseDefinition(Declaration declaration, bool isGlobal) {
     return definition;
 }
 
-json Parser::parseFunction(Declaration declaration) {
+/**
+ * Parse function
+ * @param declaration - original declaration
+ * @return - JSON tree of function definition
+ */
+json Parser::parseFunction(const Declaration &declaration) {
+    json parameters = parseParameters();
     if (lookahead(";")) {
         FunctionDeclaration functionDeclaration;
         functionDeclaration.identifier = declaration.identifier;
         functionDeclaration.type = declaration.type;
         functionDeclaration.position = declaration.position;
         functionDeclaration.kind = "FunctionDeclaration";
-        functionDeclaration.parameters = parseParameters();
+        functionDeclaration.parameters = parameters;
         return functionDeclaration;
     } else {
         FunctionDefinition functionDefinition;
@@ -228,7 +242,7 @@ json Parser::parseFunction(Declaration declaration) {
         functionDefinition.type = declaration.type;
         functionDefinition.position = declaration.position;
         functionDefinition.kind = "FunctionDefinition";
-        functionDefinition.parameters = parseParameters();
+        functionDefinition.parameters = parameters;
         functionDefinition.body = parseBody(true);
         return functionDefinition;
     }
@@ -369,18 +383,19 @@ json Parser::parseLiteral() {
         consume("}");
         literal.value = entries;
         return literal;
-    } else if (lookahead("'")) { // CharLiteral
+    } else if (curr == '\'') { // CharLiteral
+        next(true, true);
         Literal<string> literal;
         literal.kind = "CharLiteral";
         literal.position = lineNumber;
-        char ch = curr;
+        string ch = string(1, curr);
         if (curr == '\\') {
             ch = parseEscape();
         } else {
-            next(true);
+            next(true, true);
         }
         consume("'");
-        literal.value = string(1, ch);
+        literal.value = ch;
         return literal;
     } else if (curr == '"') { // StringLiteral
         Literal<string> literal;
@@ -390,7 +405,11 @@ json Parser::parseLiteral() {
         return literal;
     } else if (lookahead("0x")) { // HexNumberLiteral
         return parseNumber(16);
-    } else if (isFloat(curr)) { // NumberLiteral
+    } else if (lookahead("-0x")) { // HexNumberLiteral
+        Literal<string> literal = parseNumber(16);
+        literal.value = "-" + literal.value;
+        return literal;
+    } else if (isFloat(curr) || curr == '-') { // NumberLiteral
         return parseNumber(10);
     } else if (isIdentifierStart(curr)) { // Identifier
         return parseIdentifier();
@@ -424,10 +443,11 @@ bool Parser::declarationIncoming() {
 
 /**
  * Parse declaration
+ * @param kind - declaration kind
  * @return - JSON tree of declaration
  */
-Declaration Parser::parseDeclaration(string kind) {
-    json modifiers = json::array();
+Declaration Parser::parseDeclaration(const string &kind) {
+    json::array_t modifiers = json::array();
     bool hasModifier;
     Type type;
     type.kind = "Type";
@@ -441,9 +461,9 @@ Declaration Parser::parseDeclaration(string kind) {
             }
         }
     } while (hasModifier);
-    type.modifiers = modifiers;
     for (json &name: typeNames) {
         if (lookahead(name)) {
+            type.modifiers = modifiers;
             type.name = name;
             Declaration declaration;
             declaration.position = lineNumber;
@@ -454,6 +474,19 @@ Declaration Parser::parseDeclaration(string kind) {
             }
             return declaration;
         }
+    }
+    if (!modifiers.empty()) {
+        type.name = modifiers.back();
+        modifiers.pop_back();
+        type.modifiers = modifiers;
+        Declaration declaration;
+        declaration.position = lineNumber;
+        declaration.identifier = parseIdentifier();
+        declaration.type = type;
+        if (!kind.empty()) {
+            declaration.kind = kind;
+        }
+        return declaration;
     }
     throw unexpected("correct type name");
 }
@@ -473,16 +506,16 @@ json Parser::parseInclude() {
             next(true);
         }
     } else if (curr == '"') {
-        while (curr && curr != '"') {
+        do {
             str.push_back(curr);
             next(true);
-        }
+        } while (curr && curr != '"');
     } else {
         throw unexpected("\" or <");
     }
     str.push_back(curr);
-    next(true);
     statement.file = str;
+    next(true);
     return statement;
 }
 
@@ -522,14 +555,13 @@ json Parser::parsePredefine() {
  */
 string Parser::parseString(bool keepBlanks) {
     string str;
-    next(true);
+    next(true, true);
     while (curr && curr != '"') {
         if (curr == '\\') {
-            next(true);
-            str.push_back(parseEscape());
+            str += parseEscape();
         } else {
             str.push_back(curr);
-            next(true);
+            next(true, true);
         }
     }
     if (!lookahead("\"", keepBlanks)) {
@@ -542,35 +574,36 @@ string Parser::parseString(bool keepBlanks) {
  * Parse escaped char
  * @return - unescaped char
  */
-char Parser::parseEscape() {
+string Parser::parseEscape() {
     index++;
     curr = source[index];
     if (curr == 'x') {
-        next(true);
+        next(true, true);
         int code = 0;
 
         for (int i = 0; i < 2; i++) {
             if (isHex(curr)) {
                 code = code * 16 + (int) string("0123456789abcdef").find((char) tolower(curr));
-                next(true);
+                next(true, true);
             }
         }
-        return (char) code;
+        return string(1, code);
     } else if (isOct(curr)) {
         int code = 0;
 
         for (int i = 0; i < 3; i++) {
             if (isOct(curr)) {
                 code = code * 8 + (int) string("01234567").find((char) tolower(curr));
-                next(true);
+                next(true, true);
             }
         }
-        return (char) code;
-    } else if (char escape = escapes[curr]) {
-        next(true);
-        return escape;
+        return string(1, code);
+    } else if (escapes[curr]) {
+        string escaped = "\\" + string(1, curr);
+        next(true, true);
+        return escaped;
     } else {
-        throw unexpected("Escape sequence");
+        throw unexpected("escape sequence");
     }
 }
 
@@ -605,7 +638,7 @@ Identifier Parser::parseIdentifier(bool keepBlanks) {
  * @return - JSON tree of number literal
  */
 Literal<string> Parser::parseNumber(int digits) {
-    if (digits == 16 ? !isHex(curr) : !isFloat(curr)) {
+    if (digits == 16 && !isHex(curr)) {
         throw unexpected("Number");
     }
     Literal<string> number;
@@ -614,9 +647,14 @@ Literal<string> Parser::parseNumber(int digits) {
     if (digits == 16) {
         type = "HexNumberLiteral";
     }
+    if (curr == '.') {
+        type = "FloatNumberLiteral";
+    }
     string value = string(1, curr);
     next(true);
-    while ((curr && (digits == 16 ? isHex(curr) : isFloat(curr))) || tolower(curr) == 'e') {
+    while ((curr && (digits == 16 ? isHex(curr) : isFloat(curr)))
+           || (digits != 16 && tolower(curr) == 'e')
+           || (curr == '-' && digits != 16 && tolower(source[index - 1]) == 'e')) {
         if (curr == '.') {
             type = "FloatNumberLiteral";
         }
@@ -660,7 +698,7 @@ json Parser::parseComment() {
         statement.position = lineNumber;
         while (curr != '*' || source[index + 1] != '/') {
             str.push_back(curr);
-            next(true);
+            next(true, true);
         }
         statement.content = str;
         index += 2;
@@ -668,9 +706,9 @@ json Parser::parseComment() {
     } else if (lookahead("//")) {
         statement.kind = "InlineComment";
         statement.position = lineNumber;
-        while (!isSpace(curr)) {
+        while (curr != '\n') {
             str.push_back(curr);
-            next(true);
+            next(true, true);
         }
         statement.content = str;
     } else {
@@ -712,7 +750,7 @@ bool Parser::lookahead(const string &str, bool keepBlanks) {
  * Consume rest characters
  * @param str - characters to be skipped
  */
-void Parser::consume(string str) {
+void Parser::consume(const string &str) {
     for (char ch: str) {
         if (curr != ch) {
             throw unexpected(str);
@@ -733,8 +771,9 @@ void Parser::skipSpaces() {
 /**
  * Go to next valid character
  * @param withSpaces - should keep spaces
+ * @param withComment - should keep comment
  */
-void Parser::next(bool withSpaces) {
+void Parser::next(bool withSpaces, bool withComment) {
     if (curr == '\n') {
         lineNumber++;
     }
@@ -753,10 +792,15 @@ void Parser::next(bool withSpaces) {
             }
             skipped = true;
         }
-        json comment = parseComment();
-        if (!comment.is_null()) {
-            skipped = true;
-            comments.push_back(comment);
+        if (!withComment) {
+            json comment = parseComment();
+            if (!comment.is_null()) {
+                skipped = true;
+                comments.push_back(comment);
+            }
+            if (isIllegal(curr)) {
+                throw unexpected("legal character");
+            }
         }
     } while (skipped);
 }
@@ -793,9 +837,9 @@ json Parser::parse() {
             consume(";");
             statements.push_back(declaration);
         } else if (lookahead("struct")) {
-            throw "Struct is not supported";
+            throw runtime_error("struct is not supported");
         } else if (lookahead("enum")) {
-            throw "Enum is not supported";
+            throw runtime_error("enum is not supported");
         } else {
             throw unexpected("definition");
         }

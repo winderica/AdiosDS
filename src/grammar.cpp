@@ -88,3 +88,15 @@ bool Grammar::isSpace(char ch) {
            || ch == '\t'
            || ch == '\v';
 }
+
+/**
+ * Whether current char is illegal
+ * @param ch - current char
+ * @return - result
+ */
+bool Grammar::isIllegal(char ch) {
+    if (isSpace(ch) || ch == 0) {
+        return false;
+    }
+    return ch <= 31 || ch == 36 || ch == 64 || ch == 92 || ch == 96 || ch >= 127;
+}

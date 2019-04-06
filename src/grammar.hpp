@@ -85,11 +85,11 @@ struct Grammar {
      * operators got by anonymous function
      */
     json operators = [this]() -> json {
-        json operators;
-        transform(precedence.begin(), precedence.end(), back_inserter(operators), RetrieveKey());
+        json operatorsList;
+        transform(precedence.begin(), precedence.end(), back_inserter(operatorsList), RetrieveKey());
         Compare compare;
-        sort(operators.begin(), operators.end(), compare);
-        return operators;
+        sort(operatorsList.begin(), operatorsList.end(), compare);
+        return operatorsList;
     }();
 
     /**
@@ -144,56 +144,63 @@ struct Grammar {
      * @param ch - current char
      * @return - result
      */
-    bool isNumber(char ch);
+    static bool isNumber(char ch);
 
     /**
      * Whether current char is float
      * @param ch - current char
      * @return - result
      */
-    bool isFloat(char ch);
+    static bool isFloat(char ch);
 
     /**
      * Whether current char is hexadecimal
      * @param ch - current char
      * @return - result
      */
-    bool isHex(char ch);
+    static bool isHex(char ch);
 
     /**
      * Whether current char is octal
      * @param ch - current char
      * @return - result
      */
-    bool isOct(char ch);
+    static bool isOct(char ch);
 
     /**
      * Whether current char is start of identifier
      * @param ch - current char
      * @return - result
      */
-    bool isIdentifierStart(char ch);
+    static bool isIdentifierStart(char ch);
 
     /**
      * Whether current char is body of identifier
      * @param ch - current char
      * @return - result
      */
-    bool isIdentifierBody(char ch);
+    static bool isIdentifierBody(char ch);
 
     /**
      * Whether str is identifier
      * @param str - current string
      * @return - result
      */
-    bool isIdentifier(string str);
+    static bool isIdentifier(string str);
 
     /**
      * Whether current char is space
      * @param ch - current char
      * @return - result
      */
-    bool isSpace(char ch);
+    static bool isSpace(char ch);
+
+    /**
+     * Whether current char is illegal
+     * @param ch - current char
+     * @return - result
+     */
+    static bool isIllegal(char ch);
 };
 
 #endif // GRAMMAR_H
